@@ -32,7 +32,7 @@ coursesLoc: id=>`ms_hsxcg_courses_loc_${id}`,
 },
 market: 'pl',
 courseKindOnline: 'DEMO_DIAGNOSTIC_ONLINE_LESSON',
-courseKindStationary: 'DEMO_DIAGNOSTIC_STATIONARY_LESSON',
+courseKindStationary: 'DEMO_STATIONARY_FREE_LESSON',
 country: 'pl',
 phoneUrl: 'https://codinggiantsphoneapp.netlify.app/.netlify/functions/validate-phone',
 courseNameStrip:{enabled:true,phrases:['Darmowa lekcja próbna - ','Darmowa lekcja próbna- ',' online',' Online']},
@@ -569,23 +569,26 @@ selectedDateStr=dStr;selectedSlotId=null;selectedSlotData=null;
 _captchaToken=null;
 refreshConfirmBtn();
 _showRecaptcha();
-_gel('ms-calendar-wrap').style.display='none';
-_gel('ms-cal-selected-label').innerHTML=
-`<span class="ms-ic ms-ic-cal-alt" style="color:#e67e22;margin-right:6px;"></span>${dStr}`;
-_gel('ms-cal-collapsed').style.display='flex';
 renderTimeSlots(dStr);
+const wrap=_gel('ms-timeslots-wrap');
+if(wrap)setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},80);
 };
 window.msExpandCalendar=function(){
 _gel('ms-calendar-wrap').style.display='block';
 _gel('ms-cal-collapsed').style.display='none';
+const tw=_gel('ms-timeslots-wrap');
+if(tw)tw.style.display='none';
+selectedDateStr=null;selectedSlotId=null;selectedSlotData=null;
+refreshConfirmBtn();
 renderCalendar();
+const cw=_gel('ms-calendar-wrap');
+if(cw)setTimeout(function(){cw.scrollIntoView({behavior:'smooth',block:'start'});},80);
 };
 function renderTimeSlots(dStr){
 const raw=slotsByDate[dStr]||[];
 const wrap=_gel('ms-timeslots-wrap');
 const list=_gel('ms-timeslots-list');
 wrap.style.display='block';void wrap.offsetWidth;
-wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
 _gtm('MFonLP_hour');
 if(!raw.length){list.innerHTML=`<div class="ms-empty">${T.noSlotsOnDate}</div>`;_gel('ms-load-more-btn').style.display='none';return;}
 const seen=new Set();
@@ -824,7 +827,7 @@ fYear.on('keydown',function(ev){if(ev.ctrlKey||ev.metaKey||['Backspace','Delete'
 fYear.on('input paste',function(){this.value=this.value.replace(/\D/g,'').slice(0,4);_msUpdateLabel(this);});
 fYear.on('blur',function(){_msUpdateLabel(this);});
 _msUpdateLabel(fYear[0]);
-const yearErrEl=$('<ul class=_eclN style="display:none;"><li><label class=_eclM>Wiek dziecka musi wynosić od 7 do 18 lat.</label></li></ul>');
+const yearErrEl=$('<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">Wiek dziecka musi wynosić od 7 do 18 lat.</label></li></ul>');
 fYear.closest('.hs-form-field').append(yearErrEl);
 fYear.on('blur input',function(){
 const yr=+this.value;
@@ -836,7 +839,7 @@ fYear.toggleClass('error',!ok);
 ok?fYear.removeAttr('aria-invalid'):fYear.attr('aria-invalid','true');
 });
 }
-const fnErr=$(`<ul class=_eclN style="display:none;"><li><label class=_eclM>${T.fnMin}</label></li></ul>`);
+const fnErr=$(`<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">${T.fnMin}</label></li></ul>`);
 if(fName.length){
 fName.closest('.hs-form-field').append(fnErr);let ft=false;
 const vN=(f=false)=>{if(!ft&&!f)return true;const ok=fName.val().trim().length>=3;fnErr.toggle(!ok);fName.toggleClass('error',!ok);ok?fName.removeAttr('aria-invalid'):fName.attr('aria-invalid','true');return ok;};
@@ -846,15 +849,15 @@ const fStudentName=$form.find("input[name='"+C.fieldStudentName+"']");
 const fLastname=$form.find("input[name='"+C.fieldStudentSurname+"']");
 const _nameRe=/^[^\d\s!@#$%^&*()+={}\[\]|\\<>?\/~`;:,."]+$/;
 function _vNF(fld,err,errInv){const v=fld.val().trim();if(v.length<2){err.show();errInv.hide();fld.attr('aria-invalid','true').addClass('error');return false;}if(!_nameRe.test(v)){err.hide();errInv.show();fld.attr('aria-invalid','true').addClass('error');return false;}err.hide();errInv.hide();fld.removeAttr('aria-invalid').removeClass('error');return true;}
-function _mkNF(fld,minMsg,invMsg){if(!fld.length)return;const err=$('<ul class=_eclN style="display:none;"><li><label class=_eclM>'+minMsg+'</label></li></ul>');const errInv=$('<ul class=_eclN style="display:none;"><li><label class=_eclM>'+invMsg+'</label></li></ul>');fld.closest('.hs-form-field').append(err).append(errInv);let t=false;fld.on('input paste keyup',function(){t=true;_vNF(fld,err,errInv);});fld.on('blur',function(){t=true;_vNF(fld,err,errInv);});fld._touched=function(){return t;};fld._valid=function(){return _vNF(fld,err,errInv);};}
+function _mkNF(fld,minMsg,invMsg){if(!fld.length)return;const err=$('<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">'+minMsg+'</label></li></ul>');const errInv=$('<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">'+invMsg+'</label></li></ul>');fld.closest('.hs-form-field').append(err).append(errInv);let t=false;fld.on('input paste keyup',function(){t=true;_vNF(fld,err,errInv);});fld.on('blur',function(){t=true;_vNF(fld,err,errInv);});fld._touched=function(){return t;};fld._valid=function(){return _vNF(fld,err,errInv);};}
 _mkNF(fStudentName,T.studentNameMin||'Imię dziecka musi mieć min. 2 znaki.',T.studentNameInvalid||'Imię nie może zawierać cyfr ani znaków specjalnych.');
 _mkNF(fLastname,T.lastnameMin||'Nazwisko musi mieć min. 2 znaki.',T.lastnameInvalid||'Nazwisko nie może zawierać cyfr ani znaków specjalnych.');
 if(!fPhone.length)return;
 fPhone.attr('pattern',null);
 fPhone.one('focus',function(){if(!fPhone.val()||!fPhone.val().startsWith(p))fPhone.val(p);_msUpdateLabel(fPhone[0]);});
 fPhone.on('input',function(){_msUpdateLabel(this);});
-const fmtE=$(`<ul class=_eclN style="display:none;"><li><label class=_eclM>${T.phoneMsg}</label></li></ul>`);
-const apiE=$(`<ul class=_eclN style="display:none;"><li><label class=_eclM>${T.phoneApi}</label></li></ul>`);
+const fmtE=$(`<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">${T.phoneMsg}</label></li></ul>`);
+const apiE=$(`<ul class="no-list hs-error-msgs inputs-list" style="display:none;"><li><label class="hs-error-msg hs-main-font-element">${T.phoneApi}</label></li></ul>`);
 fPhone.closest('.hs-form-field').append(fmtE).append(apiE);
 let pt=false;
 const vP=(f=false)=>{const v=fPhone.val().trim();if(!pt&&!f)return true;if(!rx.test(v)){fmtE.show();apiE.hide();fPhone.attr('aria-invalid','true').addClass('error');return false;}fmtE.hide();apiE.hide();fPhone.removeAttr('aria-invalid').removeClass('error');return true;};
@@ -887,12 +890,12 @@ reqBoxes.each(function(){if(!$(this).is(':checked')){$(this).closest('.hs-form-f
 if(!cbOk)return;
 pt=true;if(!vP(true))return;
 if($form.find('.hs-error-msg:visible').length>0)return;
-const btn=this;btn.disabled=true;btn.innerHTML=_spnHtml;
+const btn=this;btn.disabled=true;btn.innerHTML='<div class="ms-spinner" style="width:18px;height:18px;border-width:2px;"></div>';
 const result=await validatePhoneApi(fPhone.val().trim());
 if(!result.isValid){apiE.show();fPhone.attr('aria-invalid','true').addClass('error');btn.disabled=false;btn.innerHTML=`<span>${T.nextStep}</span><span class="ms-ic ms-ic-arrow-r"></span>`;refreshStep1Btn();return;}
 apiE.hide();
 savedFormData={firstname:fName.val(),student_name:fStudentName.length?fStudentName.val().trim():'',student_surname:fLastname.length?fLastname.val().trim():'',email:$form.find('input[name="email"]').val(),phone:fPhone.val(),studentbirthyear:fYear.val(),advertisementagreed:$form.find('input[name="advertisementagreed"]').is(':checked'),statuteagreed:$form.find('input[name="statuteagreed"]').is(':checked')};
-btn.disabled=true;btn.innerHTML=_spnHtml;
+btn.disabled=true;btn.innerHTML='<div class="ms-spinner" style="width:18px;height:18px;border-width:2px;"></div>';
 const _skipped=await enterStep2();
 btn.disabled=false;btn.innerHTML=`<span>${T.nextStep}</span><span class="ms-ic ms-ic-arrow-r"></span>`;
 if(!_skipped)msGoStep(2);
