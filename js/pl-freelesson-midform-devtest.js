@@ -1,6 +1,47 @@
 (function(){
 'use strict';
 var _gel=function(id){return document.getElementById(id);};
+function _loadFABrands(){
+if(document.querySelector('link[href*="font-awesome"]')) return;
+const l=document.createElement('link');l.rel='stylesheet';
+l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+document.head.appendChild(l);
+}
+const C = {
+forceOnline: false,
+autoSelectCourse:false,
+_proxy: 'https://blue-tree-483b.ppienkowski.workers.dev',
+get api(){ const P=this._proxy; const M=this.market||'pl'; return {
+cities: `${P}/${M}/${this.courseKindStationary||"SEMESTER_STATIONARY"}/cities`,
+citiesForAge: age=>`${P}/${M}/${this.courseKindStationary||"SEMESTER_STATIONARY"}/cities/age/${age}`,
+locations: `${P}/${M}/locations`,
+coursesOnline: `${P}/${M}/courses/online/${this.courseKindOnline||"DEMO_DIAGNOSTIC_ONLINE_LESSON"}`,
+coursesByLoc: id=>`${P}/${M}/courses/stationary/${this.courseKindStationary||"SEMESTER_STATIONARY"}/${id}`,
+timetableOnline: id=>`${P}/${M}/timetable/online/${this.courseKindOnline||"DEMO_DIAGNOSTIC_ONLINE_LESSON"}/${id}`,
+timetableStationary: (id,loc)=>`${P}/${M}/timetable/stationary/${this.courseKindStationary||"SEMESTER_STATIONARY"}/${id}/${loc}`,
+};},
+get registrationApiUrl(){ return this._proxy+'/'+( this.market||'pl')+'/register'; },
+recaptchaSiteKey: '6Lf8n1kpAAAAADvC2Kzig4MEm-3VJS2ojJdHnQHd',
+portalId: '47809621',
+formId: '6eeb070b-832b-4aa9-87e5-772dfba602d9',
+cacheKey: {
+cities: 'ms_hsxcg_cities',
+citiesAge: age=>`ms_hsxcg_cities_age_${age}`,
+coursesOnline: 'ms_hsxcg_courses_online',
+coursesLoc: id=>`ms_hsxcg_courses_loc_${id}`,
+},
+market: 'pl',
+courseKindOnline: 'DEMO_DIAGNOSTIC_ONLINE_LESSON',
+courseKindStationary: 'DEMO_DIAGNOSTIC_STATIONARY_LESSON',
+country: 'pl',
+phoneUrl: 'https://codinggiantsphoneapp.netlify.app/.netlify/functions/validate-phone',
+courseNameStrip:{enabled:true,phrases:['Darmowa lekcja próbna - ','Darmowa lekcja próbna- ',' online',' Online']},
+fieldStudentName:'student_name',
+fieldStudentSurname:'student_surname',
+i18n:window._msI18n||{}
+};
+const lang=(()=>{const sup=Object.keys(C.i18n);for(const s of[document.documentElement.lang||'',navigator.language||'']){const c=s.split('-')[0].toLowerCase();if(sup.includes(c))return c;}return'pl';})();
+const T=C.i18n[lang]||C.i18n[Object.keys(C.i18n)[0]]||{};
 function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(T[k]!==undefined)el.textContent=typeof T[k]==='function'?T[k](1):T[k];});}
 const _c=k=>{try{const v=sessionStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}};
 const _s=(k,d)=>{try{sessionStorage.setItem(k,JSON.stringify(d));}catch(e){}};
